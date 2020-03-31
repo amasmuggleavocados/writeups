@@ -1,3 +1,9 @@
+TL;DR:
+1. flag is XOR encrypted
+2. Each potato walking around the arena contains a value that is used to XOR the flag
+3. Killing a potato XORs a value in the encrypted flag
+4. 2 potatos are missing, so you need to identify the pattern to decrypt the last 2 bytes
+
 Based on the name and starting the game, we're working with an FPS game
 
 ![](images/1.png)
@@ -18,11 +24,11 @@ Looking back at the rest of the files the application came with and the game ass
 
 ![](images/5.png)
 
-The solution is most likely gained by playing the game.  Opening FPS.exe in IDA and looking at the strings, we see both a Game Over! You are dead and a Game Clear!
+The solution is most likely gained by playing the game.  Opening **FPS.exe** in IDA and looking at the strings, we see both a **Game Over! You are dead** and a **Game Clear!**
 
 ![](images/6.png)
 
-Looking at the XREFs for Game Clear! we're taken to a function sub_4039c0
+Looking at the XREFs for **Game Clear!** we're taken to a function **sub_4039c0**
 
 ![](images/7.png)
 
@@ -30,11 +36,11 @@ Reviewing this function, we see that a string is passed to MessageBoxA.  But its
 
 ![](images/8.png)
 
-This is most likely our solution, so we'll mark it as __encryptedSolution and we'll name this function, __gameClear
+This is most likely our solution, so we'll mark it as **__encryptedSolution** and we'll name this function, **__gameClear**
 
 ![](images/9.png)
 
-Now that we've made things a bit easier to read, lets go back and look at all the XREFs for __encryptedSolution and see if we can find where the decryption routine is
+Now that we've made things a bit easier to read, lets go back and look at all the XREFs for **__encryptedSolution** and see if we can find where the decryption routine is
 
 ![](images/10.png)
 
@@ -44,18 +50,18 @@ Looks like we found our decryption routine
 
 This function, is a relatively simple function.
 
-  1. We push ECX and read it in with a function call (sub_403440)
+  1. We push ECX and read it in with a function call (**sub_403440**)
   2. Check to see if -1 is returned, if it is we jump to the end of the function
   3. Otherwise, we move the value returned into ECX and multiply it with 210h
   4. This [value + dword_409190] is loaded into EDX and checked to see if its greater than 0
   5. if it is, we add -2 to this value and replace it
-  6. If the jump is not taken, we XOR __encryptionSolution
+  6. If the jump is not taken, we XOR **__encryptionSolution**
 
-Time to open a debugger and breakpoint on the PUSH ECX 
+Time to open a debugger and breakpoint on the **PUSH ECX** 
 
 ![](images/12.png)
 
-Shooting one of the potatos, we hit the breakpoint.  Tracing through, we see that each potato has an associated value and this value is loaded into EAX (returned by fps.373440)
+Shooting one of the potatos, we hit the breakpoint.  Tracing through, we see that each potato has an associated value and this value is loaded into EAX (returned by **fps.373440**)
 
 ![](images/13.png)
 
@@ -65,19 +71,19 @@ Tracing further down
 
 ![](images/15.png)
 
-The value at ECX+379190 is 64h and is loaded into EDX
+The value at **ECX+379190** is **64h** and is loaded into **EDX**
 
 More tracing
 
 ![](images/16.png)
 
-We see that -2 was added to 64h which is 62h and that value overwrites the previous 64h and we exit the function.  Shooting the same potato, we go back through this loop again.  So we can assume this value is the HP of the potato.  Once potato dies, the test edx, edx will fail and we'll drop down into the XOR function.
+We see that **-2** was added to **64h** which is **62h** and that value overwrites the previous **64h** and we exit the function.  Shooting the same potato, we go back through this loop again.  So we can assume this value is the HP of the potato.  Once potato dies, the **test edx, edx** will fail and we'll drop down into the XOR function.
 
 Let's look at our encrypted string in memory
 
 ![](images/17.png)
 
-Lets try killing all the potatos and see if anything happens to our string.  To save clicks, I patched the add edx, fffffffe to add edx, ffffff9a to instantly kill the potatos
+Lets try killing all the potatos and see if anything happens to our string.  To save clicks, I patched the **add edx, fffffffe** to **add edx, ffffff9a** to instantly kill the potatos
 
 ![](images/18.png)
 
