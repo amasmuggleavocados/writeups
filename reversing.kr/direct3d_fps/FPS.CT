@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <Forms>
+    <UDF1 Class="TCEForm" Encoding="Ascii85">b7Ej%2nldAU:MM2b.}cxWeIh0Gi32eO*Ft]WMuP5%{mcIVgA6t9Fkwal+AgInNpI$=7,zGoLEqjnV-i7R=ffx00</UDF1>
+  </Forms>
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Player Health"</Description>
+      <LastState Value="10" RealAddress="00377020"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>FPS.exe+7020</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Quick Kill"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : FPS.exe
+  Version: 
+  Date   : 2020-04-02
+  Author : amasmuggleavocados
+
+  This script injects code to allow for quick kill on potatos
+}
+
+[ENABLE]
+aobscanmodule(INJECT,FPS.exe,83 C2 FE 89 91 90 91 37 00)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add edx,-02
+  mov [ecx+FPS.exe+9190],edx
+
+INJECT:
+  add edx,-80
+  mov [ecx+FPS.exe+9190],edx
+
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+INJECT:
+  db 83 C2 FE 89 91 90 91 37 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "FPS.exe"+3435
+
+"FPS.exe"+340B: 8B C8                          -  mov ecx,eax
+"FPS.exe"+340D: 69 C9 10 02 00 00              -  imul ecx,ecx,00000210
+"FPS.exe"+3413: 8B 91 90 91 37 00              -  mov edx,[ecx+FPS.exe+9190]
+"FPS.exe"+3419: 85 D2                          -  test edx,edx
+"FPS.exe"+341B: 7F 18                          -  jg INJECT
+"FPS.exe"+341D: C7 81 94 91 37 00 00 00 00 00  -  mov [ecx+FPS.exe+9194],00000000
+"FPS.exe"+3427: 8A 89 84 91 37 00              -  mov cl,[ecx+FPS.exe+9184]
+"FPS.exe"+342D: 30 88 28 70 37 00              -  xor [eax+FPS.exe+7028],cl
+"FPS.exe"+3433: 59                             -  pop ecx
+"FPS.exe"+3434: C3                             -  ret 
+// ---------- INJECTING HERE ----------
+"FPS.exe"+3435: 83 C2 FE                       -  add edx,-02
+"FPS.exe"+3438: 89 91 90 91 37 00              -  mov [ecx+FPS.exe+9190],edx
+// ---------- DONE INJECTING  ----------
+"FPS.exe"+343E: 59                             -  pop ecx
+"FPS.exe"+343F: C3                             -  ret 
+"FPS.exe"+3440: 55                             -  push ebp
+"FPS.exe"+3441: 8B EC                          -  mov ebp,esp
+"FPS.exe"+3443: 83 EC 0C                       -  sub esp,0C
+"FPS.exe"+3446: D9 05 20 56 37 00              -  fld dword ptr [FPS.exe+5620]
+"FPS.exe"+344C: 53                             -  push ebx
+"FPS.exe"+344D: 56                             -  push esi
+"FPS.exe"+344E: D9 5D F8                       -  fstp dword ptr [ebp-08]
+"FPS.exe"+3451: 57                             -  push edi
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Encrypted Key"</Description>
+      <LastState RealAddress="00377028"/>
+      <VariableType>String</VariableType>
+      <Length>50</Length>
+      <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>fps.exe+7028</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>
